@@ -27,7 +27,7 @@ async def on_ready():
 
 # To obtain DSC_BOT_KEY, go to your bot site on discord.com/developers/applications/,
 # choose your bot or create a new one (remember to provide admin permission).
-# Next go to Bot section and under TOKEN click button "Copy".
+# Next go to Bot section and under TOKEN section click button "Copy".
 
 # (Optional)To obtain RESPONSE_CHANNEL, log in on your browser,
 # go to the text channel and from the url copy the last number.
