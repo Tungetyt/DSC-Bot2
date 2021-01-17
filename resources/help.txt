@@ -4,4 +4,5 @@
 "pause": "zapauzuj film",
 "stop": "zatrzymaj film",
 "leave": "opusc kanal glosowy",
-"???": "i inne sekretne..."
+"???": "i inne sekretne...",
+"nie wiem": "w jaki sposob dac znaki specjalne:("
