@@ -5,7 +5,6 @@ import os
 import youtube_dl
 from dotenv import load_dotenv
 import json
-import codecs
 
 load_dotenv()
 
@@ -13,6 +12,7 @@ load_dotenv()
 client = commands.Bot(command_prefix='?')
 mp3_dir = "music"
 pic_dir = 'co_memes'
+temp_mp3_name = "song.mp3"
 ydl_opts = {
     'format': 'bestaudio/best',
     'postprocessors': [{
@@ -22,8 +22,13 @@ ydl_opts = {
     }],
 }
 
-with open(f'co_aliases.txt') as rs:
-    co_alias = rs.read().splitlines()
+
+def read_file(file_name):
+    with open(f"{file_name}.txt") as rs:
+        return rs.read().splitlines()
+
+
+co_alias = read_file('co_aliases')
 client.remove_command('help')
 players = {}
 
@@ -56,16 +61,9 @@ async def secret(ctx, *, message):
 @client.command()
 async def help(ctx):
     embed_var = discord.Embed(title="Komendy:", description="przed komenda dodaj \"?\"", color=0x00ff00)
-    jaks_slownik = {
-        "co": "nie wiem",
-        "clear {ilosc}": "wyczysc podana ilosc wiadomosci",
-        "play {link}": "pusc film z youtube",
-        "pause": "zapauzuj film",
-        "stop": "zatrzymaj film",
-        "leave": "opusc kanal glosowy",
-        "???": "i inne sekretne..."
-    }
-    for name, value in jaks_slownik.items():
+    with open('help.json') as rs:
+        help_json = rs.read()
+    for name, value in json.loads(help_json).items():
         embed_var.add_field(name=name, value=value, inline=False)
     await ctx.send(embed=embed_var)
 
@@ -73,10 +71,10 @@ async def help(ctx):
 # Youtube commands:
 @client.command()
 async def play(ctx, url: str):
-    song_there = os.path.isfile(f"{mp3_dir}/song.mp3")
+    song_there = os.path.isfile(f"{mp3_dir}/{temp_mp3_name}")
     try:
         if song_there:
-            os.remove(f"{mp3_dir}/song.mp3")
+            os.remove(f"{mp3_dir}/{temp_mp3_name}")
     except PermissionError:
         await ctx.send("Wait for the current playing music to end or use the 'stop' command")
         return
@@ -130,8 +128,7 @@ async def send_pic_or_txt_on_choice(ctx, choice):
     elif choice == '2':
         await ctx.send(file=discord.File(f'{pic_dir}/{random.randint(1, 4)}.png'))
     else:
-        with open(f'responses.txt') as rs:
-            responses = rs.readlines()
+        responses = read_file('responses')
         await ctx.send(f'{random.choice(responses)}')
 
 
@@ -144,9 +141,9 @@ async def download_and_play_video(ctx, url):
         ydl.download([url])
     for file in os.listdir(f"./"):
         if file.endswith(".mp3"):
-            os.rename(file, "song.mp3")
-    os.replace("song.mp3", f"{mp3_dir}/song.mp3")
-    voice.play(discord.FFmpegPCMAudio(f"{mp3_dir}/song.mp3"))
+            os.rename(file, temp_mp3_name)
+    os.replace(temp_mp3_name, f"{mp3_dir}/{temp_mp3_name}")
+    voice.play(discord.FFmpegPCMAudio(f"{mp3_dir}/{temp_mp3_name}"))
 
 
 client.run(os.getenv("DSC_BOT_KEY"))
