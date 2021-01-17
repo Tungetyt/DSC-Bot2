@@ -56,13 +56,17 @@ async def secret(ctx, *, message):
 @client.command()
 async def help(ctx):
     embed_var = discord.Embed(title="Komendy:", description="przed komenda dodaj \"?\"", color=0x00ff00)
-    embed_var.add_field(name="co", value="nie wiem", inline=False)
-    embed_var.add_field(name="clear {ilosc}", value="wyczysc podana ilosc wiadomosci", inline=False)
-    embed_var.add_field(name="play {link}", value="pusc film z youtube", inline=False)
-    embed_var.add_field(name="pause", value="zapauzuj film", inline=False)
-    embed_var.add_field(name="stop", value="zatrzymaj film", inline=False)
-    embed_var.add_field(name="leave", value="opusc kanal glosowy", inline=False)
-    embed_var.add_field(name="???", value="i inne sekretne...", inline=False)
+    jaks_slownik = {
+        "co": "nie wiem",
+        "clear {ilosc}": "wyczysc podana ilosc wiadomosci",
+        "play {link}": "pusc film z youtube",
+        "pause": "zapauzuj film",
+        "stop": "zatrzymaj film",
+        "leave": "opusc kanal glosowy",
+        "???": "i inne sekretne..."
+    }
+    for name, value in jaks_slownik.items():
+        embed_var.add_field(name=name, value=value, inline=False)
     await ctx.send(embed=embed_var)
 
 
