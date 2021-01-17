@@ -6,6 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 client = commands.Bot(command_prefix='?')
+client.remove_command('help')
 
 @client.event
 async def on_ready():
@@ -21,9 +22,19 @@ async def clear(ctx, amount=5):
     await ctx.channel.purge(limit=amount+1)
 
 @client.command()
-async def secret(ctx, *, param):
+async def secret(ctx, *, message):
     channel = client.get_channel(int(os.getenv("RESPONSE_CHANNEL")))
-    await channel.send(f'{param}')
+    embed_var = discord.Embed(title=f"{message}", color=0xff770f)
+    await channel.send(embed=embed_var)
+
+@client.command()
+async def help(ctx):
+    embed_var = discord.Embed(title="Komendy:",description="przed komenda dodaj \"?\"", color=0x00ff00)
+    embed_var.add_field(name="co",value="nie wiem", inline=False)
+    embed_var.add_field(name="clear", value="wyczysc podana ilosc wiadomosci", inline=False)
+    embed_var.add_field(name="???", value="i inne sekretne...", inline=False)
+    await ctx.send(embed=embed_var)
+
 
 def get_random_number_unless_specified(question):
     if question == '1':
