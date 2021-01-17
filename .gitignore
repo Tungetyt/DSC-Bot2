@@ -124,5 +124,6 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-#My own
+# My own
 credentials.json
+music/
