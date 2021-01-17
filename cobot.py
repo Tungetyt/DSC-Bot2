@@ -4,6 +4,8 @@ import random
 import os
 import youtube_dl
 from dotenv import load_dotenv
+import json
+import codecs
 
 load_dotenv()
 
@@ -19,7 +21,6 @@ ydl_opts = {
         'preferredquality': '192',
     }],
 }
-
 
 with open(f'co_aliases.txt') as rs:
     co_alias = rs.read().splitlines()
@@ -75,18 +76,7 @@ async def play(ctx, url: str):
     except PermissionError:
         await ctx.send("Wait for the current playing music to end or use the 'stop' command")
         return
-
-    voice_channel = discord.utils.get(ctx.guild.voice_channels, name='Ogólne')
-    await voice_channel.connect()
-    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
-
-    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
-        ydl.download([url])
-    for file in os.listdir(f"./"):
-        if file.endswith(".mp3"):
-            os.rename(file, "song.mp3")
-    os.replace("song.mp3", f"{mp3_dir}/song.mp3")
-    voice.play(discord.FFmpegPCMAudio(f"{mp3_dir}/song.mp3"))
+    await download_and_play_video(ctx, url)
 
 
 @client.command()
@@ -139,6 +129,20 @@ async def send_pic_or_txt_on_choice(ctx, choice):
         with open(f'responses.txt') as rs:
             responses = rs.readlines()
         await ctx.send(f'{random.choice(responses)}')
+
+
+async def download_and_play_video(ctx, url):
+    voice_channel = discord.utils.get(ctx.guild.voice_channels, name="Ogólne")
+    await voice_channel.connect()
+    voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
+
+    with youtube_dl.YoutubeDL(ydl_opts) as ydl:
+        ydl.download([url])
+    for file in os.listdir(f"./"):
+        if file.endswith(".mp3"):
+            os.rename(file, "song.mp3")
+    os.replace("song.mp3", f"{mp3_dir}/song.mp3")
+    voice.play(discord.FFmpegPCMAudio(f"{mp3_dir}/song.mp3"))
 
 
 client.run(os.getenv("DSC_BOT_KEY"))
