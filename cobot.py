@@ -20,6 +20,11 @@ async def co(ctx, *, question=''):
 async def clear(ctx, amount=5):
     await ctx.channel.purge(limit=amount+1)
 
+@client.command()
+async def secret(ctx, *, param):
+    channel = client.get_channel(int(os.getenv("RESPONSE_CHANNEL")))
+    await channel.send(f'{param}')
+
 def get_random_number_unless_specified(question):
     if question == '1':
         return '1'
