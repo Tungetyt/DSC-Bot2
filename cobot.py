@@ -61,7 +61,7 @@ async def play(ctx, url: str):
         if song_there:
             os.remove(f"{mp3_dir}/{temp_mp3_name}")
     except PermissionError:
-        await ctx.send("Wait for the current playing music to end or use the 'stop' command")
+        await ctx.send("Zaczekaj aż skończy się aktualny utwór, lub zakończ go komendą \"stop\".")
         return
     await download_and_play_video(ctx, url)
 
@@ -72,7 +72,7 @@ async def leave(ctx):
     if voice.is_connected():
         await voice.disconnect()
     else:
-        await ctx.send("The bot is not connected to a voice channel.")
+        await ctx.send("Nie jestem podłączony do kanału głosowego.")
 
 
 @client.command()
@@ -81,7 +81,7 @@ async def pause(ctx):
     if voice.is_playing():
         voice.pause()
     else:
-        await ctx.send("Currently no audio is playing.")
+        await ctx.send("Na ten moment nie gra żadne audio.")
 
 
 @client.command()
@@ -90,7 +90,7 @@ async def resume(ctx):
     if voice.is_paused():
         voice.resume()
     else:
-        await ctx.send("The audio is not paused.")
+        await ctx.send("Audio jest zapauzowane.")
 
 
 @client.command()
