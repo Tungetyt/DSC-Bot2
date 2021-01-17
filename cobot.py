@@ -1,30 +1,46 @@
-import discord
 from discord.ext import commands
-import random
 import os
 import youtube_dl
 from dotenv import load_dotenv
 import json
-from helpers import read_file
-from config import *
+from helpers import *
 load_dotenv()
 
 # Set command prefix:
-client = commands.Bot(command_prefix='?')
+client = commands.Bot(command_prefix=prefix)
 
 
-co_alias = read_file('co_aliases')
+co_alias = read_file(f'{res_dir}/co_aliases')
 client.remove_command('help')
 players = {}
 
 
-# Startup:
+# Startup: The bot won't work, until it prints out the message.
 @client.event
 async def on_ready():
     print('Bot is ready.')
 
 
+# First, create a ".env" file and provide the data in the following format:
+# DSC_BOT_KEY=################################
+# RESPONSE_CHANNEL=##################                               -(Optional)
+
+# To obtain DSC_BOT_KEY, go to your bot site on discord.com/developers/applications/,
+# choose your bot or create a new one (remember to provide admin permission).
+# Next go to Bot section and under TOKEN click button "Copy".
+
+# (Optional)To obtain RESPONSE_CHANNEL, log in on your browser,
+# go to the text channel and from the url copy the last number.
+
+# You can change every file in "resources" folder to personalize the bot.
+# You can also add any .jpg or .png pictures to "co_memes" directory
+
+# Command names are under @client.event. To change the command call name, change name in code below.
+# To remove command, just comment it out or remove code. They are independent from each other.
+
+
 # Commands:
+
 @client.command(aliases=co_alias)
 async def co(ctx, *, question=''):
     choice = get_random_number_unless_specified(question)
@@ -36,25 +52,25 @@ async def clear(ctx, amount=5):
     await ctx.channel.purge(limit=amount + 1)
 
 
-# Use bot to message other channel:
 @client.command()
-async def secret(ctx, *, message):
+async def secret(*, message):   # Use bot to message other channel:
     channel = client.get_channel(int(os.getenv("RESPONSE_CHANNEL")))
     embed_var = discord.Embed(title=f"{message}", color=0xff770f)
     await channel.send(embed=embed_var)
 
 
 @client.command()
-async def help(ctx):
+async def help(ctx):            # DON'T CHANGE THIS COMMAND!!!
     embed_var = discord.Embed(title="Komendy:", description="przed komenda dodaj \"?\"", color=0x00ff00)
-    help_json = "".join(read_file('help'))
+    help_json = "".join(read_file(f'{res_dir}/help'))
     for name, value in json.loads('{'+help_json+'}').items():
         embed_var.add_field(name=name, value=value, inline=False)
     await ctx.send(embed=embed_var)
 
 
 # Youtube commands:
-@client.command()
+
+@client.command()               # Do not remove this command! (you can still change the call name)
 async def play(ctx, url: str):
     song_there = os.path.isfile(f"{mp3_dir}/{temp_mp3_name}")
     try:
@@ -99,24 +115,7 @@ async def stop(ctx):
     voice.stop()
 
 
-def get_random_number_unless_specified(question):
-    if question == '1':
-        return '1'
-    elif question == '2':
-        return '2'
-    return f'{random.randint(1, 8)}'
-
-
-async def send_pic_or_txt_on_choice(ctx, choice):
-    if choice == '1':
-        await ctx.send(file=discord.File(f'{pic_dir}/{random.randint(1, 4)}.jpg'))
-    elif choice == '2':
-        await ctx.send(file=discord.File(f'{pic_dir}/{random.randint(1, 4)}.png'))
-    else:
-        responses = read_file('responses')
-        await ctx.send(f'{random.choice(responses)}')
-
-
+# Don't change this method!
 async def download_and_play_video(ctx, url):
     voice_channel = discord.utils.get(ctx.guild.voice_channels, name="Ogólne")
     await voice_channel.connect()
