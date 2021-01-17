@@ -4,12 +4,14 @@ import random
 import os
 import youtube_dl
 from dotenv import load_dotenv
+import shutil
 load_dotenv()
 
 client = commands.Bot(command_prefix='?')
 client.remove_command('help')
 
 players = {}
+mp3_dir = "music"
 
 @client.event
 async def on_ready():
@@ -35,24 +37,26 @@ async def secret(ctx, *, message):
 async def help(ctx):
     embed_var = discord.Embed(title="Komendy:",description="przed komenda dodaj \"?\"", color=0x00ff00)
     embed_var.add_field(name="co",value="nie wiem", inline=False)
-    embed_var.add_field(name="clear", value="wyczysc podana ilosc wiadomosci", inline=False)
+    embed_var.add_field(name="clear {ilosc}", value="wyczysc podana ilosc wiadomosci", inline=False)
+    embed_var.add_field(name="play {link}", value="pusc film z youtube", inline=False)
+    embed_var.add_field(name="pause", value="zapauzuj film", inline=False)
+    embed_var.add_field(name="stop", value="zatrzymaj film", inline=False)
+    embed_var.add_field(name="leave", value="opusc kanal glosowy", inline=False)
     embed_var.add_field(name="???", value="i inne sekretne...", inline=False)
     await ctx.send(embed=embed_var)
 
-
-
 @client.command()
 async def play(ctx, url : str):
-    song_there = os.path.isfile("song.mp3")
+    song_there = os.path.isfile(f"{mp3_dir}/song.mp3")
     try:
         if song_there:
-            os.remove("song.mp3")
+            os.remove(f"{mp3_dir}/song.mp3")
     except PermissionError:
         await ctx.send("Wait for the current playing music to end or use the 'stop' command")
         return
 
-    voiceChannel = discord.utils.get(ctx.guild.voice_channels, name='General')
-    await voiceChannel.connect()
+    voice_channel = discord.utils.get(ctx.guild.voice_channels, name='Ogólne')
+    await voice_channel.connect()
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
 
     ydl_opts = {
@@ -65,10 +69,11 @@ async def play(ctx, url : str):
     }
     with youtube_dl.YoutubeDL(ydl_opts) as ydl:
         ydl.download([url])
-    for file in os.listdir("./"):
+    for file in os.listdir(f"./"):
         if file.endswith(".mp3"):
             os.rename(file, "song.mp3")
-    voice.play(discord.FFmpegPCMAudio("song.mp3"))
+    os.replace("song.mp3", f"{mp3_dir}/song.mp3")
+    voice.play(discord.FFmpegPCMAudio(f"{mp3_dir}/song.mp3"))
 
 @client.command()
 async def leave(ctx):
@@ -78,7 +83,6 @@ async def leave(ctx):
     else:
         await ctx.send("The bot is not connected to a voice channel.")
 
-
 @client.command()
 async def pause(ctx):
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
@@ -86,7 +90,6 @@ async def pause(ctx):
         voice.pause()
     else:
         await ctx.send("Currently no audio is playing.")
-
 
 @client.command()
 async def resume(ctx):
@@ -96,43 +99,10 @@ async def resume(ctx):
     else:
         await ctx.send("The audio is not paused.")
 
-
 @client.command()
 async def stop(ctx):
     voice = discord.utils.get(client.voice_clients, guild=ctx.guild)
     voice.stop()
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# @client.command(pass_context=True)
-# async def join(ctx):
-#     channel = ctx.message.author.voice.voice_channel
-#     await client.join_voice_channel(channel)
-#
-# @client.command(pass_context=True)
-# async def leave(ctx):
-#     server = ctx.message.server
-#     voice_client = client.voice_client_in(server)
-#     player = await voice_client.disconnect()
-#
-# @client.command(pass_context=True)
-# async def play(ctx, url):
-#     server = ctx.message.server
-#     voice_client = client.voice_client_in(server)
-#     player = await voice_client.create_ytdl_player(url)
-#     players[server.id] = player
-#     player.start()
 
 def get_random_number_unless_specified(question):
     if question == '1':
@@ -142,13 +112,13 @@ def get_random_number_unless_specified(question):
     return f'{random.randint(1,8)}'
 
 async def send_pic_or_txt_on_choice(ctx, choice):
-    dirname = 'resources'
+    pic_dir = 'resources'
     if choice == '1':
-        await ctx.send(file=discord.File(f'{dirname}/{random.randint(1,4)}.jpg'))
+        await ctx.send(file=discord.File(f'{pic_dir}/{random.randint(1,4)}.jpg'))
     elif choice == '2':
-        await ctx.send(file=discord.File(f'{dirname}/{random.randint(1,4)}.png'))
+        await ctx.send(file=discord.File(f'{pic_dir}/{random.randint(1,4)}.png'))
     else:
-        with open(f'{dirname}/responses.txt') as rs:
+        with open(f'{pic_dir}/responses.txt') as rs:
             responses = rs.readlines()
         await ctx.send(f'{random.choice(responses)}')
 
