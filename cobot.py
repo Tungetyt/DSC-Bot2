@@ -11,14 +11,14 @@ client = commands.Bot(command_prefix='?')
 async def on_ready():
     print('Bot is ready.')
 
-@client.command(aliases=['cO','Co','CO','co?','CO?','cot'])
+@client.command(aliases=['cO','Co','CO','co?','CO?','cot',''])
 async def co(ctx, *, question=''):
     choice = get_random_number_unless_specified(question)
     await send_pic_or_txt_on_choice(ctx, choice)
 
 @client.command()
 async def clear(ctx, amount=5):
-    await ctx.channel.purge(limit=amount)
+    await ctx.channel.purge(limit=amount+1)
 
 def get_random_number_unless_specified(question):
     if question == '1':
