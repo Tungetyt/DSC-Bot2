@@ -5,11 +5,11 @@ import os
 import youtube_dl
 from dotenv import load_dotenv
 import json
-from read_methods import read_file
+from helpers import read_file
 from config import *
 load_dotenv()
 
-# Settings:
+# Set command prefix:
 client = commands.Bot(command_prefix='?')
 
 
@@ -36,6 +36,7 @@ async def clear(ctx, amount=5):
     await ctx.channel.purge(limit=amount + 1)
 
 
+# Use bot to message other channel:
 @client.command()
 async def secret(ctx, *, message):
     channel = client.get_channel(int(os.getenv("RESPONSE_CHANNEL")))
