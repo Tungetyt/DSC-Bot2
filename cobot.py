@@ -5,27 +5,12 @@ import os
 import youtube_dl
 from dotenv import load_dotenv
 import json
-
+from read_methods import read_file
+from config import *
 load_dotenv()
 
 # Settings:
 client = commands.Bot(command_prefix='?')
-mp3_dir = "music"
-pic_dir = 'co_memes'
-temp_mp3_name = "song.mp3"
-ydl_opts = {
-    'format': 'bestaudio/best',
-    'postprocessors': [{
-        'key': 'FFmpegExtractAudio',
-        'preferredcodec': 'mp3',
-        'preferredquality': '192',
-    }],
-}
-
-
-def read_file(file_name):
-    with open(f"{file_name}.txt") as rs:
-        return rs.read().splitlines()
 
 
 co_alias = read_file('co_aliases')
@@ -61,9 +46,8 @@ async def secret(ctx, *, message):
 @client.command()
 async def help(ctx):
     embed_var = discord.Embed(title="Komendy:", description="przed komenda dodaj \"?\"", color=0x00ff00)
-    with open('help.json') as rs:
-        help_json = rs.read()
-    for name, value in json.loads(help_json).items():
+    help_json = "".join(read_file('help'))
+    for name, value in json.loads('{'+help_json+'}').items():
         embed_var.add_field(name=name, value=value, inline=False)
     await ctx.send(embed=embed_var)
 
