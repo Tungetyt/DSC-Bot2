@@ -128,4 +128,4 @@ dmypy.json
 credentials.json
 music/song.mp3
 .idea/
-.bat
+cobot.bat
